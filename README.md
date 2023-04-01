@@ -1,6 +1,6 @@
 # Cairo 1.0 installer
 
-This tool installs [Cairo 1.0](https://github.com/starkware-libs/cairo). It is inspired by [pyenv-installer](https://github.com/pyenv/pyenv-installer).
+This tool installs [Cairo 1.0](https://github.com/starkware-libs/cairo).
 
 ## Prerequisites
 
@@ -24,9 +24,17 @@ If you wish to install a specific release of Cairo rather than the latest head, 
 curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-installer | bash
 ```
 
-After installing, follow [these instructions](#set-up-your-shell-environment-for-pyenv) to set up your shell environment.
+After installing, follow [these instructions](#set-up-your-shell-environment-for-cairo) to set up your shell environment.
+
+### Update
+
+```
+rm -fr ~/.cairo
+curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-installer | bash
+```
 
 ### Uninstall
+
 Cairo is installed within $CAIRO_ROOT (default: ~/.cairo). To uninstall, just remove it:
 
 ```bash
@@ -105,7 +113,7 @@ The below setup should work for the vast majority of users for common use cases.
     Otherwise, execute the snippet below:
 
     ~~~ fish
-    set -Ux CAIRO_ROOT $HOME/.pyenv
+    set -Ux CAIRO_ROOT $HOME/.cairo
     set -U fish_user_paths $CAIRO_ROOT/target/release $fish_user_paths
     ~~~
 
