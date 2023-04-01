@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+set -e
+[ -n "$CAIRO_DEBUG" ] && set -x
+
+if [ -z "$CAIRO_ROOT" ]; then
+  export CAIRO_ROOT="${HOME}/.cairo"
+fi
+
+colorize() {
+  if [ -t 1 ]; then printf "\e[%sm%s\e[m" "$1" "$2"
+  else echo -n "$2"
+  fi
+}
+
+# Checks for `.cairo` file, and suggests to remove it for installing
+if [ -d "${CAIRO_ROOT}" ]; then
+  { echo
+    colorize 1 "WARNING"
+    echo ": Can not proceed with installation. Kindly remove the '${CAIRO_ROOT}' directory first."
+    echo
+  } >&2
+    exit 1
+fi
+
+failed_checkout() {
+  echo "Failed to git clone $1"
+  exit -1
+}
+
+checkout() {
+  [ -d "$2" ] || git -c advice.detachedHead=0 clone --branch "$3" --depth 1 "$1" "$2" || failed_checkout "$1"
+}
+
+if ! command -v git 1>/dev/null 2>&1; then
+  echo "cairo: Git is not installed, can't continue." >&2
+  exit 1
+fi
+
+if ! command -v cargo 1>/dev/null 2>&1; then
+  echo "cairo: Rust is not installed, can't continue." >&2
+  exit 1
+else
+    rustup override set stable
+    rustup update
+fi
+
+# Check ssh authentication if USE_SSH is present
+if [ -n "${USE_SSH}" ]; then
+  if ! command -v ssh 1>/dev/null 2>&1; then
+    echo "cairo: configuration USE_SSH found but ssh is not installed, can't continue." >&2
+    exit 1
+  fi
+
+  # `ssh -T git@github.com' returns 1 on success
+  # See https://docs.github.com/en/authentication/connecting-to-github-with-ssh/testing-your-ssh-connection
+  ssh -T git@github.com 1>/dev/null 2>&1 || EXIT_CODE=$?
+  if [[ ${EXIT_CODE} != 1 ]]; then
+      echo "cairo: github ssh authentication failed."
+      echo
+      echo "In order to use the ssh connection option, you need to have an ssh key set up."
+      echo "Please generate an ssh key by using ssh-keygen, or follow the instructions at the following URL for more information:"
+      echo
+      echo "> https://docs.github.com/en/repositories/creating-and-managing-repositories/troubleshooting-cloning-errors#check-your-ssh-access"
+      echo
+      echo "Once you have an ssh key set up, try running the command again."
+    exit 1
+  fi
+fi
+
+if [ -n "${USE_SSH}" ]; then
+  GITHUB="git@github.com:"
+else
+  GITHUB="https://github.com/"
+fi
+
+checkout "${GITHUB}starkware-libs/cairo.git"            "${CAIRO_ROOT}"                           "${CAIRO_GIT_TAG:-main}"
+cargo build --all --release --manifest-path ${CAIRO_ROOT}/Cargo.toml
+
+if ! command -v cairo-run 1>/dev/null; then
+  { echo
+    colorize 1 "WARNING"
+    echo ": seems you still have not added 'cairo' to the load path."
+    echo
+  } >&2
+fi
