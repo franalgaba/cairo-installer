@@ -18,7 +18,7 @@ Once prerequisites have been installed correctly:
 
 ### Install
 
-If you wish to install a specific release of Cairo rather than the latest head, set the CAIRO_GIT_TAG environment variable (e.g. export CAIRO_GIT_TAG=v1.0.0-alpha.6).
+If you wish to install a specific release of Cairo rather than the latest head, set the `CAIRO_GIT_TAG` environment variable (e.g. `export CAIRO_GIT_TAG=v1.0.0-alpha.6`).
 
 ```bash 
 curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-installer | bash
@@ -35,7 +35,7 @@ curl -L https://github.com/franalgaba/cairo-installer/raw/main/bin/cairo-install
 
 ### Uninstall
 
-Cairo is installed within $CAIRO_ROOT (default: ~/.cairo). To uninstall, just remove it:
+Cairo is installed within `$CAIRO_ROOT` (default: ~/.cairo). To uninstall, just remove it:
 
 ```bash
 rm -fr ~/.cairo
